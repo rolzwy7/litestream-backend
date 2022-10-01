@@ -11,11 +11,7 @@ import {
 } from '@nestjs/common';
 import { createReadStream, existsSync, readFileSync } from 'fs';
 import { StreamService } from './stream.service';
-
-type Chapter = {
-  title: string;
-  dir: string;
-};
+import { Chapter } from './stream.types';
 
 @Controller('stream')
 export class StreamController {
@@ -41,21 +37,31 @@ export class StreamController {
       'chapters.json',
     );
 
-    if (!existsSync(chapters_filepath)) throw new BadRequestException();
+    if (!existsSync(chapters_filepath)) {
+      return {
+        success: false,
+        code: 'STREAM_NOT_FOUND',
+        msg: `Stream with provided stream_id doesn't exist in: ${chapters_filepath}`,
+        ehh: process.env.MEDIA_DIR,
+      };
+    }
 
     const chapters_json = JSON.parse(readFileSync(chapters_filepath, 'utf-8'));
 
-    return chapters_json.map((chapter: Chapter) => ({
-      ...chapter,
-      player_url: this.streamService.buildStreamURL(
-        this.streamService.createAccessToken(
-          stream_id,
-          chapter.dir,
-          expires_in,
+    return {
+      success: true,
+      chapters: chapters_json.map((chapter: Chapter) => ({
+        ...chapter,
+        player_url: this.streamService.buildStreamURL(
+          this.streamService.createAccessToken(
+            stream_id,
+            chapter.dir,
+            expires_in,
+          ),
         ),
-      ),
-      subs: this.streamService.buildSubtitlesArray(stream_id, chapter.dir),
-    }));
+        subs: this.streamService.buildSubtitlesArray(stream_id, chapter.dir),
+      })),
+    };
   }
 
   /**
