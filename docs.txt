@@ -1,0 +1,68 @@
+litestreaming-backend is a very simple streaming service capable of
+sharing video streams in MPEG-DASH format in safe way using JWT tokens.
+
+litestreaming-backend is aiming to be as minimalistic as possible.
+
+# How it works
+
+First generate URL to manifest.mpd file with endpoint (you need to provide password for that):
+POST /stream/access/:stream_id
+Body (JSON):
+{
+    "password": "<password here>"
+}
+
+Then "player_url" parameters can be used by any MPEG-DASH player.
+"player_url" is an endpoint URL:
+GET /stream/proxy/:jwt_token/:filename
+
+JWT token is a guard for access.
+
+# Configuration
+
+You only need to configure .env file.
+
+Set your own password, secret for jwt signing and absolute url address of your service.
+
+# Media folder
+
+Directly in `media` folder there should be a directory which name is `stream_id`.
+Inside this folder there should be JSON file called `chapters.js`, for example:
+[
+  {
+    "title": "Some title for this chapter",
+    "duration": {
+      "h": 0,
+      "m": 15,
+      "s": 46
+    },
+    "dir": "chapter_1"
+  },
+  ... more ...
+]
+
+So the chapter item looks like this:
+{
+    "title": "Some title for this chapter",
+    "duration": {
+      "h": 0,
+      "m": 15,
+      "s": 46
+    },
+    "dir": "chapter_1"
+}
+
+It can have additional filed like "subtitles" array saved in subtitles/subtitles.json:
+[
+    {
+      src: 'public/example-media/subtitles/en.vtt',
+      kind: 'subtitles',
+      language: 'en',
+      label: 'English',
+      contentType: 'text/vtt',
+    }
+]
+
+
+For every "dir" key there should be a directory whit the "dir" name (for example "chapter_1").
+Those dirs contain all MPEG-DASH files: manifest, audio and video segments.
