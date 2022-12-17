@@ -22,7 +22,7 @@ Main objectives:
 - Stream can contain many chapters (many MPEG-DASH streams under the same stream id)
 
 ##### What litestream-backend can't do?
-- Convert videos to MPEG-DASH format. You need to do it yourself.
+- Convert videos to MPEG-DASH format. You need to do it yourself. (or use [litestream-tool's](https://github.com/rolzwy7/litestream-tool) generate dash command)
 - Create [Media directory structure](#media-directory-structure)
 
 ## Installation & Running dev
